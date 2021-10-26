@@ -103,13 +103,10 @@ app.route("/articles/:articleTitle")
         // console.log(req.body.title)
         // console.log(req.body.content)
         Article.updateOne(
-            {title: req.params.articleTitle},
+            { title: req.params.articleTitle },
             {
-                $set:
-                {
-                    title: req.body.title,
-                    content: req.body.content
-                }
+                title: req.body.title,
+                content: req.body.content
             },
             { overwrite: true },
             function (err) {
@@ -121,7 +118,20 @@ app.route("/articles/:articleTitle")
             }
         );
     })
-    .patch()
+    .patch(function (req, res) {
+        Article.updateOne(
+            { title: req.params.articleTitle },
+            { $set: req.body },
+            { overwrite: true },
+            function (err) {
+                if (!err) {
+                    res.send("Article updated successfully!");
+                } else {
+                    res.send(err)
+                }
+            }
+        );
+    })
     .delete();
 
 
