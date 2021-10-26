@@ -22,60 +22,107 @@ const articlesSchema = {
 const Article = new mongoose.model("Article", articlesSchema);
 
 app.get("/", function (req, res) {
-      res.send("Hello, Check for articles domain");
+    res.send("Hello, Check for articles domain");
 });
 
-// handeling get request
-app.get("/articles", function (req, res) {
-    //   res.send("Hello");
-    Article.find(function (err, foundArticles) {
-        if (!err) {
-            // console.log(foundArticles);
-            // foundArticles.forEach(function(article){            
-            //     console.log(article.title);            
-            // });
-            res.send(foundArticles);
-        }else{
-            res.send(err);
-        }
-    });
-});
-
-
-// handeling post request
-app.post("/articles", function(req, res){
-    // console.log(req.body.title);
-    // console.log(req.body.content);    
-    const article = new Article({
-        title: req.body.title,
-        content: req.body.content
-    });
-    article.save(function(err){
-        if(err){
-            res.send(err);
-        }else{
-            res.send("Successfully posted!!!");
-        }
-    });
-})
-
-// handeling delete request
-// get deleted data https://github.com/londonappbrewery/Build-Your-Own-RESTful-API
-app.delete("/articles", function(req, res){
-    // console.log("delete");
-    Article.deleteMany({},function(err){
-        if(err){
-            res.send(err);
-        }else{
-            res.send("Successfully deleted!!!");
-        }
+///////////////////////////////////// All Articles ////////////////////////////////////////////
+app.route("/articles")
+    // handeling get request
+    .get(function (req, res) {
+        //   res.send("Hello");
+        Article.find(function (err, foundArticles) {
+            if (!err) {
+                // console.log(foundArticles);
+                // foundArticles.forEach(function(article){            
+                //     console.log(article.title);            
+                // });
+                res.send(foundArticles);
+            } else {
+                res.send(err);
+            }
+        });
     })
-})
 
-// app.route("/articles"){
-//     .
-// }
 
+    // handeling post request
+    .post(function (req, res) {
+        // console.log(req.body.title);
+        // console.log(req.body.content);    
+        const article = new Article({
+            title: req.body.title,
+            content: req.body.content
+        });
+        article.save(function (err) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send("Successfully posted!!!");
+            }
+        });
+    })
+
+    // handeling delete request
+    // get deleted data https://github.com/londonappbrewery/Build-Your-Own-RESTful-API
+    .delete(function (req, res) {
+        // console.log("delete");
+        Article.deleteMany({}, function (err) {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send("Successfully deleted!!!");
+            }
+        });
+    })
+///////////////////////////////////// All Articles ////////////////////////////////////////////
+
+
+
+
+///////////////////////////////////// specific Articles ////////////////////////////////////////////
+
+app.route("/articles/:articleTitle")
+    .get(function (req, res) {
+        // console.log(req.params.article);
+        Article.findOne({ title: req.params.articleTitle }, function (err, foundArticles) {
+            // console.log(foundArticles);
+            if (err) {
+                res.send(err);
+            } else {
+
+                if (foundArticles) {
+                    res.send(foundArticles);
+                } else {// if(foundArticles.length === 0){
+                    res.send("Not found")
+                }
+            }
+        })
+    })
+
+    .put(function (req, res) {
+        // console.log(req.params.articleTitle)
+        // console.log(req.body.title)
+        // console.log(req.body.content)
+        Article.updateOne(
+            {title: req.params.articleTitle},
+            {
+                $set:
+                {
+                    title: req.body.title,
+                    content: req.body.content
+                }
+            },
+            { overwrite: true },
+            function (err) {
+                if (!err) {
+                    res.send("Updated successfully!");
+                } else {
+                    res.send("error")
+                }
+            }
+        );
+    })
+    .patch()
+    .delete();
 
 
 
